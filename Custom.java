@@ -66,20 +66,23 @@ public class Custom {
         preOrder(node.left);
         preOrder(node.right);
     }
+
     public static void inOrder(Node node){
         if(node==null)return;
 
-        preOrder(node.left);
+        inOrder(node.left);
         System.out.println(node.data);
-        preOrder(node.right);
+        inOrder(node.right);
     }
+
     public static void postOrder(Node node){
         if(node==null)return;
 
-        preOrder(node.left);
-        preOrder(node.right);
+        postOrder(node.left);
+        postOrder(node.right);
         System.out.println(node.data);
     }
+
     public static void traverse(Node node){
         if(node==null)return;
 
@@ -180,17 +183,52 @@ public class Custom {
         pathToLeafFromRoot(node.right,path+" "+node.data,sum+node.data,lo,hi);
     }
 
-    public static void transformToLeftClonedTree(Node node){
-        if(node==null)return;
-
-        if(node.left!=null){
-            Node clone =new Node(node.data,node.left,node.right);
-            node.left=clone;
-        }
-        transformToLeftClonedTree(node.left);
-        transformToLeftClonedTree(node.right);
-
+    public static Node transformToLeftClonedTree(Node node){
+        if(node==null)return null;
+        Node lcr=transformToLeftClonedTree(node.left);
+        Node rcr=transformToLeftClonedTree(node.right);
+        node.right=rcr;
+        Node nn=new Node(node.data,lcr,null);
+        node.left=nn;
+        return node;
     }
+
+    public static Node transformBackFromLeftClonedTree(Node node){
+        if(node==null)return null;
+        Node lcr=transformBackFromLeftClonedTree(node.left.left);
+        Node rcr=transformBackFromLeftClonedTree(node.right);
+        Node temp=node.left;
+        node.left=node.left.left;
+        temp.left=null;
+        return node;
+    }
+
+    public static void removeLeaves(Node node){
+        if(node==null)return;
+        if(node.left!=null&&node.left.left==null&&node.left.right==null)node.left=null;
+        if(node.right!=null&&node.right.left==null&&node.right.right==null)node.right=null;
+        removeLeaves(node.left);
+        removeLeaves(node.right);
+    }
+
+    static boolean isBalanced=true;
+    public static int isBalancedTree(Node node){
+        if(node==null)return 0;
+        int lh=isBalancedTree(node.left);
+        int rh=isBalancedTree(node.right);
+        if(Math.abs(lh-rh)>1)isBalanced=false;
+        return Math.max(lh,rh)+1;
+    }
+
+   static int dia=Integer.MIN_VALUE;
+    public static int diameter(Node node){
+        if(node==null)return 0;
+        int lh=diameter(node.left);
+        int rh=diameter(node.right);
+        dia=Math.max(dia,lh+rh+1);
+        return Math.max(lh,rh)+1;
+    }
+
     public static void main(String[] args) {
         Integer[] arr= {50,25,12,null,null,37,30,null,null,null,75,62,null,70,null,null,87,null,null};
         Stack<Pair> st=new Stack<>();
@@ -238,9 +276,17 @@ public class Custom {
 //        printKDown(root,2);
 //        printSingleChildNodes(root);
 //        pathToLeafFromRoot(root,"",0,150,250);
-        display(root);
-        System.out.println();
-        transformToLeftClonedTree(root);
-        display(root);
+//        display(root);
+//        System.out.println();
+//        transformToLeftClonedTree(root);
+//        display(root);
+//        transformBackFromLeftClonedTree(root);
+//        System.out.println();
+//        removeLeaves(root);
+//        display(root);
+        isBalancedTree(root);
+        System.out.println(isBalanced);
+        diameter(root);
+        System.out.println(dia);
     }
 }
